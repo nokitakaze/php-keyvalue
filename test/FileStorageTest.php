@@ -280,8 +280,10 @@
             $this->assertTrue(true);
         }
 
-        protected function clear_test(/** @noinspection PhpSignatureMismatchDuringInheritanceInspection */
-            FileStorage $kv, $count) {
+        protected function clear_test(AbstractStorage $kv, $count) {
+            /**
+             * @var FileStorage $kv
+             */
             $filename = "{$kv->folder}/ascetkey_".$kv->get_prefix().'.dat';
             file_put_contents($filename, '1');
             $filenames = [$filename];
