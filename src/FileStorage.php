@@ -89,8 +89,8 @@
                     throw new KeyValueException(sprintf('Folder %s does not exist', dirname($folder)),
                         self::ERROR_CODE + 5);
                 } else {
-                    mkdir($folder);
-                    chmod($folder, (7 << 6) | (7 << 3));
+                    @mkdir($folder);
+                    @chmod($folder, (7 << 6) | (7 << 3));
                 }
             }
 
@@ -100,13 +100,13 @@
             $hash = hash('sha512', $key);
             $folder .= '/'.substr($hash, 0, 2);
             if (!file_exists($folder)) {
-                mkdir($folder);
-                chmod($folder, (7 << 6) | (7 << 3));
+                @mkdir($folder);
+                @chmod($folder, (7 << 6) | (7 << 3));
             }
             $folder .= '/'.substr($hash, 2, 2);
             if (!file_exists($folder)) {
-                mkdir($folder);
-                chmod($folder, (7 << 6) | (7 << 3));
+                @mkdir($folder);
+                @chmod($folder, (7 << 6) | (7 << 3));
             }
         }
 

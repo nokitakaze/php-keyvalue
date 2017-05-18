@@ -284,6 +284,7 @@
 
             $texts = self::format_hmset_arguments($values);
             unset($values);
+            $this->get_lock($key);
             $this->redis_send('multi');
             $redis_answer = $this->redis_recv(1);
             if ($redis_answer != "+OK\r\n") {
@@ -439,6 +440,12 @@
          * @throws KeyValueException
          */
         function set_expires_time($key, $ttl) {
+            $current_ttl = $this->get_expires_time($key);
+            if (is_null($current_ttl)) {
+                // Нет такого объекта
+                return;
+            }
+
             $this->redis_send('multi');
             $redis_answer = $this->redis_recv(1);
             if ($redis_answer != "+OK\r\n") {
