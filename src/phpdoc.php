@@ -35,6 +35,7 @@
      * @property mixed          $value
      * @property string|null    $init_file
      * @property integer|null   $init_line
+     * @property integer|null   $pid
      */
     interface KeyValueDatum {
     }

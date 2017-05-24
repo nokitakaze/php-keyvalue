@@ -65,7 +65,7 @@
          * @param mixed          $value Новое значение
          * @param double         $ttl   Кол-во секунд, после которых значение будет считаться просроченным
          *
-         * @return object
+         * @return object|KeyValueDatum
          */
         protected function form_datum_value($key, $value, $ttl) {
             $backtrace = debug_backtrace();
@@ -77,6 +77,7 @@
                 'value' => $value,
                 'init_file' => isset($backtrace[1], $backtrace[1]['file']) ? $backtrace[1]['file'] : null,
                 'init_line' => isset($backtrace[1], $backtrace[1]['line']) ? $backtrace[1]['line'] : null,
+                'pid' => function_exists('posix_getpid') ? posix_getpid() : null,// @todo windows
             ];
             unset($backtrace);
 

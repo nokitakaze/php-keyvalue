@@ -1,4 +1,5 @@
 <?php
+
     namespace NokitaKaze\KeyValue;
 
     use NokitaKaze\Mutex\FileMutex;
@@ -46,6 +47,9 @@
             $this->assertNull($kv->get_value_full(''));
         }
 
+        /**
+         * @backupGlobals
+         */
         function testGet_environment() {
             AbstractStorage::get_environment('host');
             AbstractStorage::get_environment('root');
@@ -59,7 +63,6 @@
                 $this->fail('AbstractStorage::get_environment did not throw Exception');
             }
 
-            $server_real = $_SERVER;
             //
             $_SERVER['HTTP_HOST'] = 'example.com';
             $this->assertEquals('example.com', AbstractStorage::get_environment('host'));
@@ -70,39 +73,53 @@
             $this->assertEquals('/tmp', AbstractStorage::get_environment('root'));
             $_SERVER['DOCUMENT_ROOT'] = '/dev/shm';
             $this->assertEquals('/dev/shm', AbstractStorage::get_environment('root'));
-
-            $_SERVER = $server_real;
         }
 
         function testForm_datum_value() {
             $data_set = [
                 ['nyan', 100, function ($value, \PHPUnit_Framework_TestCase $obj) {
+                    /** @var KeyValueDatum $value */
+                    $obj::assertEquals(posix_getpid(), $value->pid);
                     $obj::assertEquals('nyan', $value->value);
                 }],
                 [null, 100, function ($value, \PHPUnit_Framework_TestCase $obj) {
+                    /** @var KeyValueDatum $value */
+                    $obj::assertEquals(posix_getpid(), $value->pid);
                     $obj::assertNull($value->value);
                 }],
                 [true, 100, function ($value, \PHPUnit_Framework_TestCase $obj) {
+                    /** @var KeyValueDatum $value */
+                    $obj::assertEquals(posix_getpid(), $value->pid);
                     $obj::assertNotNull($value->value);
                     $obj::assertTrue($value->value);
                 }],
                 [false, 100, function ($value, \PHPUnit_Framework_TestCase $obj) {
+                    /** @var KeyValueDatum $value */
+                    $obj::assertEquals(posix_getpid(), $value->pid);
                     $obj::assertNotNull($value->value);
                     $obj::assertFalse($value->value);
                 }],
                 [0, 100, function ($value, \PHPUnit_Framework_TestCase $obj) {
+                    /** @var KeyValueDatum $value */
+                    $obj::assertEquals(posix_getpid(), $value->pid);
                     $obj::assertNotNull($value->value);
                     $obj::assertEquals(0, $value->value);
                 }],
                 ['', 100, function ($value, \PHPUnit_Framework_TestCase $obj) {
+                    /** @var KeyValueDatum $value */
+                    $obj::assertEquals(posix_getpid(), $value->pid);
                     $obj::assertNotNull($value->value);
                     $obj::assertEquals('', $value->value);
                 }],
                 [[], 100, function ($value, \PHPUnit_Framework_TestCase $obj) {
+                    /** @var KeyValueDatum $value */
+                    $obj::assertEquals(posix_getpid(), $value->pid);
                     $obj::assertNotNull($value->value);
                     $obj::assertInternalType('array', $value->value);
                 }],
                 [(object) [], 0, function ($value, \PHPUnit_Framework_TestCase $obj) {
+                    /** @var KeyValueDatum $value */
+                    $obj::assertEquals(posix_getpid(), $value->pid);
                     $obj::assertLessThan(microtime(true), $value->time_expires);
                 }],
             ];
@@ -125,7 +142,7 @@
                      */
                     $value = $reflectionMethod->invoke($kv, 'foobar', $datum[0], $datum[1]);
                     $this->assertInternalType('object', $value);
-                    foreach (['time_create', 'time_expires', 'init_file', 'init_line', 'host', 'value', 'key'] as $key) {
+                    foreach (['time_create', 'time_expires', 'init_file', 'init_line', 'host', 'value', 'key', 'pid'] as $key) {
                         if (!array_key_exists($key, $value)) {
                             $this->fail(sprintf('Key `%s` does not exist in value. With value=%s; exp=%d',
                                 $key, $datum[0], $datum[1]));
