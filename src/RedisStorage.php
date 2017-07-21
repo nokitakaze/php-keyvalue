@@ -535,7 +535,7 @@
             // @todo Любой мьютекс
             $this->_locks[$key] = new FileMutex([
                 'name' => 'ascetkey_'.$key,
-                'type' => MutexInterface::SERVER,
+                'prefix' => '',
                 'folder' => $folder,
             ]);
         }

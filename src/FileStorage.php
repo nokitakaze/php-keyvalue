@@ -179,7 +179,7 @@
             // @todo Любой мьютекс
             $this->_locks[$key] = new FileMutex([
                 'name' => $this->get_mutex_key_name($key),
-                'type' => MutexInterface::SERVER,
+                'prefix' => '',
                 'folder' => $this->get_folder($key),
             ]);
         }
