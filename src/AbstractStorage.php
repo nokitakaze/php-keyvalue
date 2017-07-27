@@ -307,6 +307,7 @@
          */
         protected function create_lock($key) {
             // @todo Любой мьютекс
+            // @todo отдельный метод для роутинга мьютексов
             $this->_locks[$key] = new FileMutex([
                 'name' => 'ascetkey_'.$key,
                 'prefix' => '',
