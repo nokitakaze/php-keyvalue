@@ -2,7 +2,6 @@
 
     namespace NokitaKaze\KeyValue;
 
-    use NokitaKaze\Mutex\MutexInterface;
     use NokitaKaze\Mutex\FileMutex;
 
     /**

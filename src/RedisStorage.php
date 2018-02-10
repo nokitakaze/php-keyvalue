@@ -2,7 +2,6 @@
 
     namespace NokitaKaze\KeyValue;
 
-    use NokitaKaze\Mutex\MutexInterface;
     use NokitaKaze\Mutex\FileMutex;
 
     /**
@@ -417,6 +416,7 @@
          * @param string $key
          *
          * @return double|null
+         * @throws KeyValueException
          */
         function get_expires_time($key) {
             $this->redis_send(sprintf('ttl %s', $this->get_full_key_name($key)));

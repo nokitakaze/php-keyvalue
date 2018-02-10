@@ -215,6 +215,7 @@
          *
          * @param string $key Название ключа
          * @param double $ttl Кол-во секунд, после которых значение будет считаться просроченным
+         * @throws KeyValueException
          */
         function set_expires_time($key, $ttl) {
             $data = $this->get_value_full($key);
