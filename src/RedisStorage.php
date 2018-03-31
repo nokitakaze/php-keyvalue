@@ -21,6 +21,9 @@
 
         protected $_mutex_root_folder = null;
 
+        /**
+         * @param KeyValueSettings|object $settings
+         */
         function __construct($settings) {
             $default_settings = [
                 'database' => 0,
