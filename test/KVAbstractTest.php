@@ -207,7 +207,7 @@
                     $this->assertEquals($t, $t1);
                     $this->assertEquals($t, $kv1->get('key', null));
                 }
-                $kv1->delete('key');
+                $this->assertTrue($kv1->delete('key'));
                 $this->assertNull($kv1->get_value('key', null));
                 $this->assertNull($kv1->get('key', null));
             }
@@ -216,6 +216,91 @@
 
             $kv->delete_value('key');
             $kv1->delete_value('key');
+            $this->assertFalse($kv->has('key'));
+            $this->assertFalse($kv1->has('key'));
+        }
+
+        /**
+         * Общий тест, проверяющий то, что значения не теряются
+         *
+         * @param array $params
+         *
+         * @throws \Exception
+         * @backupGlobals
+         */
+        function set_value_sub_psr16($params) {
+            $_SERVER['HTTP_HOST'] = 'example.com';
+            $_SERVER['DOCUMENT_ROOT'] = '/dev/shm';
+            $this->set_value_sub_low_level_psr16($params);
+            unset($_SERVER['HTTP_HOST'], $_SERVER['DOCUMENT_ROOT']);
+            $this->set_value_sub_low_level_psr16($params);
+        }
+
+        protected function set_value_sub_low_level_psr16($params) {
+            /**
+             * @var AbstractStorage $kv
+             * @var AbstractStorage $kv1
+             */
+            $kv = $this->get_kv_storage($params);
+            $this->assertEquals($this->_class_name, get_class($kv));
+            $this->_last_kv = $kv;
+            $kv1 = $this->get_kv_storage($params);
+            $this->assertEquals($this->_class_name, get_class($kv1));
+            // Часть этих тестов это дублирование set_value_sub_low_level, это нормально
+            $this->assertTrue($kv->delete('key'));
+            $this->assertNull($kv->get('key', null));
+            $this->assertEquals('', $kv->get('key', ''));
+            $this->assertNotNull($kv->get('key', 'nyan'));
+
+            //
+            $this->assertTrue($kv->set('key', 'value', 3600));
+            $this->assertTrue($kv->has('key'));
+            $t = $kv->get('key');
+            $this->assertNotNull($t);
+            $this->assertNotNull($kv->get_change_time('key'));
+            $this->assertEquals('value', $t);
+            //
+            if (!self::time_expires_accurate()) {
+                $this->assertTrue($kv->set('key', 'value', 0));
+                $this->assertTrue($kv->has('key'));
+                $this->assertNull($kv->get('key'));
+                $this->assertNull($kv->get_change_time('key'));
+                $this->assertEquals('nyan', $kv->get('key', 'nyan'));
+            }
+            //
+            foreach (['pasu', '', "\\", "'", '"', 1, 1.0, 2.234, true, null, [], ['nyan' => 'pasu'], (object) []] as $value) {
+                $this->assertTrue($kv->set('key', $value, 3600));
+                $this->assertTrue($kv->has('key'));
+                $t = $kv->get('key');
+                if (is_null($value)) {
+                    $this->assertNull($t);
+                    continue;
+                }
+
+                $this->assertNotNull($t);
+                $this->assertInternalType(gettype($value), $t);
+                if (is_array($t)) {
+                    $this->assertEquals(count($value), count($t));
+                } elseif (!is_bool($t) and !is_object($t)) {
+                    $this->assertEquals($value, $t);
+                }
+
+                $full_t = $kv->get_value_full('key');
+                $this->assertLessThan(2, abs($full_t->time_create - $kv->get_change_time('key')));
+
+                $this->assertTrue($kv1->set('key', $value, 3600));
+                $t1 = $kv1->get('key');
+                if (!is_array($t) and !is_object($t)) {
+                    $this->assertEquals($t, $t1);
+                }
+                $this->assertTrue($kv1->delete('key'));
+                $this->assertNull($kv1->get('key'));
+            }
+
+            // @todo Большой текст
+
+            $this->assertTrue($kv->delete('key'));
+            $this->assertTrue($kv1->delete('key'));
             $this->assertFalse($kv->has('key'));
             $this->assertFalse($kv1->has('key'));
         }
@@ -585,11 +670,11 @@
          * @param integer $type1
          * @param integer $type2
          *
-         * @covers \NokitaKaze\KeyValue\AbstractStorage::getMultiple
-         * @covers \NokitaKaze\KeyValue\AbstractStorage::setMultiple
-         * @covers \NokitaKaze\KeyValue\AbstractStorage::get
-         * @covers \NokitaKaze\KeyValue\AbstractStorage::set
-         * @covers \NokitaKaze\KeyValue\AbstractStorage::deleteMultiple
+         * @covers       \NokitaKaze\KeyValue\AbstractStorage::getMultiple
+         * @covers       \NokitaKaze\KeyValue\AbstractStorage::setMultiple
+         * @covers       \NokitaKaze\KeyValue\AbstractStorage::get
+         * @covers       \NokitaKaze\KeyValue\AbstractStorage::set
+         * @covers       \NokitaKaze\KeyValue\AbstractStorage::deleteMultiple
          *
          * @throws \Exception
          * @dataProvider dataMultiple
@@ -607,7 +692,7 @@
                 }
             } elseif ($type1 == 1) {
                 foreach ($list as $key => &$value) {
-                    $kv->set($key, $value);
+                    $this->assertTrue($kv->set($key, $value));
                 }
             } elseif ($type1 == 2) {
                 $kv->setMultiple($list);

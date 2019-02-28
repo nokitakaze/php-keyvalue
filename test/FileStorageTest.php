@@ -47,6 +47,15 @@
         }
 
         /**
+         * @backupGlobals
+         */
+        function testSet_value_psr16() {
+            $this->set_value_sub_psr16(['multi_folder' => false]);
+            $this->set_value_sub_psr16(['multi_folder' => false]);// @hint Это не ошибка, этот тест прогоняется дважды
+            $this->set_value_sub_psr16(['multi_folder' => true]);
+        }
+
+        /**
          * @param array $params
          *
          * @return object

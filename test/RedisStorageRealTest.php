@@ -109,8 +109,17 @@
          * @backupGlobals
          */
         function testGeneral_real() {
-            for ($i = 0; $i < 10; $i++) {// Зачем 100 раз? Потому что Redis, вот зачем
+            for ($i = 0; $i < 10; $i++) {// Зачем 10 раз? Потому что Redis, вот зачем
                 $this->set_value_sub([]);
+            }
+        }
+
+        /**
+         * @backupGlobals
+         */
+        function testGeneral_real_psr16() {
+            for ($i = 0; $i < 10; $i++) {// Зачем 10 раз? Потому что Redis, вот зачем
+                $this->set_value_sub_psr16([]);
             }
         }
 
